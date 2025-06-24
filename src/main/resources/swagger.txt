@@ -1,0 +1,2797 @@
+{
+    "openapi": "3.0.1",
+    "info": {
+        "title": "AONE Order Service API",
+        "description": "AONE Order Service API",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8091/orders",
+            "description": "orders"
+        }
+    ],
+    "security": [
+        {
+            "bearerAuth": [
+
+            ]
+        }
+    ],
+    "tags": [
+        {
+            "name": "PackageController",
+            "description": "PackageController API"
+        }
+    ],
+    "paths": {
+        "/api/v1/orders/cod": {
+            "put": {
+                "tags": [
+                    "cod-controller"
+                ],
+                "summary": "Consignment Bulk update Cod",
+                "operationId": "updateBulkCod",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ConsignmentUpdateBulkCodRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseObject"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/orders/cod/{trackingId}": {
+            "put": {
+                "tags": [
+                    "cod-controller"
+                ],
+                "summary": "Consignment update Cod",
+                "operationId": "updateCod",
+                "parameters": [
+                    {
+                        "name": "trackingId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ConsignmentUpdateCodRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseObject"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/orders": {
+            "get": {
+                "tags": [
+                    "orders-controller"
+                ],
+                "summary": "Orders pagination list",
+                "operationId": "filter_1",
+                "parameters": [
+                    {
+                        "name": "request",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/components/schemas/OrderPageRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseObject"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "orders-controller"
+                ],
+                "summary": "Placing an order",
+                "operationId": "createOrder",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateOrderRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseObject"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/orders/print/package/{customerAccount}/reference-numbers": {
+            "post": {
+                "tags": [
+                    "print-controller"
+                ],
+                "summary": "Print package label by package's referenceNumbers",
+                "operationId": "generateWaybillFile",
+                "parameters": [
+                    {
+                        "name": "customerAccount",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/orders/print/bulk": {
+            "post": {
+                "tags": [
+                    "print-controller"
+                ],
+                "summary": "Print labels in bulk",
+                "operationId": "generateLabelFileBulk",
+                "parameters": [
+                    {
+                        "name": "url",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/orders/import": {
+            "post": {
+                "tags": [
+                    "orders-import-controller"
+                ],
+                "summary": "Import orders in batches",
+                "operationId": "importOrders",
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "file"
+                                ],
+                                "type": "object",
+                                "properties": {
+                                    "file": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseObject"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/orders/event/creation/retry": {
+            "post": {
+                "tags": [
+                    "orders-controller"
+                ],
+                "operationId": "retryOrderEvent",
+                "parameters": [
+                    {
+                        "name": "request",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/components/schemas/RetryOrderCreationEventRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseObject"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/orders/cod/upload": {
+            "post": {
+                "tags": [
+                    "cod-controller"
+                ],
+                "summary": "Upload File",
+                "operationId": "uploadFile",
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "file"
+                                ],
+                                "type": "object",
+                                "properties": {
+                                    "file": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseObject"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/orders/cancel": {
+            "post": {
+                "tags": [
+                    "orders-controller"
+                ],
+                "summary": "cancel a consignment",
+                "operationId": "cancel",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ConsignmentCancelRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseObject"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/kafka/consignment-event/{trackingId}": {
+            "post": {
+                "tags": [
+                    "kafka-controller"
+                ],
+                "summary": "Handle events, events db ids to be passed",
+                "operationId": "uploadFile_1",
+                "parameters": [
+                    {
+                        "name": "trackingId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "array",
+                                "items": {
+                                    "type": "integer",
+                                    "format": "int64"
+                                }
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseObject"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/customer/sequencers": {
+            "get": {
+                "tags": [
+                    "customer-sequencer-controller"
+                ],
+                "operationId": "getCustomerSequencers",
+                "parameters": [
+                    {
+                        "name": "request",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/components/schemas/CustomerSequencerPageRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseObject"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "customer-sequencer-controller"
+                ],
+                "operationId": "createCustomerSequencer",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateCustomerSequencerRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseObject"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/consignments/reconcile": {
+            "post": {
+                "tags": [
+                    "consignment-controller"
+                ],
+                "summary": "Reconcile consignments",
+                "operationId": "reconcile",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseObject"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/consignments/ddu": {
+            "post": {
+                "tags": [
+                    "consignment-ddu-controller"
+                ],
+                "summary": "Receive Delivered Duty Unpaid Amount",
+                "operationId": "receiveDDU",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ConsignmentDDURequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseObject"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/consignments/ddu/upload": {
+            "post": {
+                "tags": [
+                    "consignment-ddu-controller"
+                ],
+                "summary": "Bulk upload ddu amount",
+                "operationId": "upload",
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "file"
+                                ],
+                                "type": "object",
+                                "properties": {
+                                    "file": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseObject"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1.1/packages": {
+            "post": {
+                "tags": [
+                    "PackageController"
+                ],
+                "summary": "Packages pagination list",
+                "operationId": "getPackagePageList",
+                "parameters": [
+                    {
+                        "name": "request",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/components/schemas/PackagePageRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseObject"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1.1/packages/export": {
+            "post": {
+                "tags": [
+                    "PackageController"
+                ],
+                "summary": "Packages export",
+                "operationId": "export",
+                "parameters": [
+                    {
+                        "name": "request",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/components/schemas/PackagePageRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/v1.1/consignments": {
+            "post": {
+                "tags": [
+                    "external-api",
+                    "global api"
+                ],
+                "summary": "Consignments pagination list",
+                "operationId": "filter",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/OrderPageRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseObject"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1.1/consignments/export": {
+            "post": {
+                "tags": [
+                    "consignment-v-1_1-controller"
+                ],
+                "summary": "Consignment Export",
+                "operationId": "exportConsignment",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/OrderPageRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/v1/orders/weight/reconcile": {
+            "patch": {
+                "tags": [
+                    "weight-reconcile-controller"
+                ],
+                "operationId": "reconcileWeight",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/WeightReconcileRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseObject"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/customer/sequencers/{id}/status": {
+            "patch": {
+                "tags": [
+                    "customer-sequencer-controller"
+                ],
+                "operationId": "updateStatus",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateCustomerSequencerStatusRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/v1/customer/sequencers/booking-settings": {
+            "patch": {
+                "tags": [
+                    "customer-sequencer-controller"
+                ],
+                "operationId": "updateBookingSettings",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/BookingSettingsRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/v1/consignments/{trackingId}/origin-address": {
+            "patch": {
+                "tags": [
+                    "consignment-controller"
+                ],
+                "summary": "updates consignment destination address based on the provided request",
+                "operationId": "updateOriginAddress",
+                "parameters": [
+                    {
+                        "name": "trackingId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateConsignmentPickupAddressRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseObject"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/consignments/{trackingId}/incoterms": {
+            "patch": {
+                "tags": [
+                    "consignment-ddu-controller"
+                ],
+                "summary": "updates consignment incoterms based on the provided request",
+                "operationId": "updateConsignmentIncoterm",
+                "parameters": [
+                    {
+                        "name": "trackingId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateConsignmentIncotermRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseObject"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/consignments/{trackingId}/fulfillment": {
+            "patch": {
+                "tags": [
+                    "consignment-controller"
+                ],
+                "summary": "update the fulfillment details based on the provided request",
+                "operationId": "updateFulfillmentDetails",
+                "parameters": [
+                    {
+                        "name": "trackingId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateFulfillmentRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseObject"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/consignments/{trackingId}/destination-address": {
+            "patch": {
+                "tags": [
+                    "consignment-controller"
+                ],
+                "summary": "updates consignment destination address based on the provided request",
+                "operationId": "updateDestinationAddress",
+                "parameters": [
+                    {
+                        "name": "trackingId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateConsignmentDestinationAddressRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseObject"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/consignments/{trackingId}/ddu": {
+            "patch": {
+                "tags": [
+                    "consignment-ddu-controller"
+                ],
+                "summary": "receive consignment ddu amount based on the provided request",
+                "operationId": "receiveDDUAmount",
+                "parameters": [
+                    {
+                        "name": "trackingId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ApplyConsignmentDDURequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseObject"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/consignments/destination-address": {
+            "patch": {
+                "tags": [
+                    "consignment-controller"
+                ],
+                "summary": "updates consignment destination address in batch",
+                "operationId": "uploadConsignmentAddress",
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "file"
+                                ],
+                                "type": "object",
+                                "properties": {
+                                    "file": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseObject"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/packages": {
+            "get": {
+                "tags": [
+                    "PackageController"
+                ],
+                "summary": "Packages pagination list",
+                "operationId": "getPackagePageList_1",
+                "parameters": [
+                    {
+                        "name": "request",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/components/schemas/PackagePageRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseObject"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/packages/export": {
+            "get": {
+                "tags": [
+                    "PackageController"
+                ],
+                "summary": "Packages export",
+                "operationId": "export_1",
+                "parameters": [
+                    {
+                        "name": "request",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/components/schemas/PackagePageRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/v1/orders/{trackingId}": {
+            "get": {
+                "tags": [
+                    "orders-controller"
+                ],
+                "summary": "Get detail based on the trackingId",
+                "operationId": "getOrderDetailByTrackingId",
+                "parameters": [
+                    {
+                        "name": "trackingId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseObject"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/orders/{trackingId}/tracking": {
+            "get": {
+                "tags": [
+                    "orders-controller"
+                ],
+                "summary": "Get Consignment's tracking",
+                "operationId": "tracking",
+                "parameters": [
+                    {
+                        "name": "trackingId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseObject"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/orders/{trackingId}/page": {
+            "get": {
+                "tags": [
+                    "orders-controller"
+                ],
+                "summary": "Get detail based on the trackingId",
+                "operationId": "getOrderDetailByTrackingIdAsPage",
+                "parameters": [
+                    {
+                        "name": "trackingId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseObject"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/orders/{trackingId}/events": {
+            "get": {
+                "tags": [
+                    "orders-controller"
+                ],
+                "summary": "Get Consignment's external events",
+                "operationId": "externalEvents",
+                "parameters": [
+                    {
+                        "name": "trackingId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseObject"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/orders/{customerId}/consignments/{orderReference}": {
+            "get": {
+                "tags": [
+                    "orders-controller"
+                ],
+                "summary": "Get detail based on the [order number,customer account]",
+                "operationId": "getOrderDetailByCustomerAccountAndReferenceNumber",
+                "parameters": [
+                    {
+                        "name": "customerId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "orderReference",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseObject"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/orders/trackingIds": {
+            "get": {
+                "tags": [
+                    "orders-controller"
+                ],
+                "summary": "Orders pagination list having only trackingIds in response",
+                "operationId": "getTrackingIds",
+                "parameters": [
+                    {
+                        "name": "request",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/components/schemas/OrderPageRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseObject"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/orders/template/download": {
+            "get": {
+                "tags": [
+                    "orders-import-controller"
+                ],
+                "operationId": "download",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/orders/print/{trackingId}": {
+            "get": {
+                "tags": [
+                    "print-controller"
+                ],
+                "summary": "Print waybill label",
+                "operationId": "generateWaybillFile_1",
+                "parameters": [
+                    {
+                        "name": "trackingId",
+                        "in": "path",
+                        "description": "trackingId",
+                        "required": true,
+                        "schema": {
+                            "pattern": "^\\S{1,40}$",
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "url",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/orders/print/package/{packageTrackingId}": {
+            "get": {
+                "tags": [
+                    "print-controller"
+                ],
+                "summary": "Print package label",
+                "operationId": "generateWaybillFile_2",
+                "parameters": [
+                    {
+                        "name": "packageTrackingId",
+                        "in": "path",
+                        "description": "packageTrackingId",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/orders/print/package/reference-number/{referenceNumber}": {
+            "get": {
+                "tags": [
+                    "print-controller"
+                ],
+                "summary": "Print package label by package's referenceNumber",
+                "operationId": "generateWaybillFile_3",
+                "parameters": [
+                    {
+                        "name": "referenceNumber",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "customerAccount",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "url",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/orders/print/label": {
+            "get": {
+                "tags": [
+                    "print-controller"
+                ],
+                "summary": "Parse the token in the request path and print the shipping label",
+                "operationId": "print",
+                "parameters": [
+                    {
+                        "name": "token",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "byte"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/orders/print/file/{fileName}": {
+            "get": {
+                "tags": [
+                    "print-controller"
+                ],
+                "summary": "Print airway bill by fileUuid",
+                "operationId": "download_1",
+                "parameters": [
+                    {
+                        "name": "fileName",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "byte"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/orders/cod/download": {
+            "get": {
+                "tags": [
+                    "cod-controller"
+                ],
+                "summary": "Download Template",
+                "operationId": "download_2",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/v1/lookups/{lookupType}": {
+            "get": {
+                "tags": [
+                    "lookup-controller"
+                ],
+                "summary": "Get common enumeration values",
+                "description": "AddressType, ContentType, DimensionUnit, Incoterms, PickupMethod, WeightUnit,EventStatus",
+                "operationId": "getLookups",
+                "parameters": [
+                    {
+                        "name": "lookupType",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseObject"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/customer/sequencers/export": {
+            "get": {
+                "tags": [
+                    "customer-sequencer-controller"
+                ],
+                "operationId": "exportCustomerSequencers",
+                "parameters": [
+                    {
+                        "name": "request",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/components/schemas/CustomerSequencerPageRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/v1/consignments": {
+            "get": {
+                "tags": [
+                    "consignment-controller"
+                ],
+                "summary": "Consignments pagination list",
+                "operationId": "filter_2",
+                "parameters": [
+                    {
+                        "name": "request",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/components/schemas/OrderPageRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseObject"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/consignments/{trackingId}": {
+            "get": {
+                "tags": [
+                    "consignment-controller"
+                ],
+                "summary": "Get detail based on the trackingId",
+                "operationId": "getConsignmentDetailByTrackingId",
+                "parameters": [
+                    {
+                        "name": "trackingId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseObject"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/consignments/{trackingId}/signature/download": {
+            "get": {
+                "tags": [
+                    "consignment-controller"
+                ],
+                "summary": "Download signature image",
+                "operationId": "downloadSignatureProof",
+                "parameters": [
+                    {
+                        "name": "trackingId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/v1/consignments/{trackingId}/payment-proof/download": {
+            "get": {
+                "tags": [
+                    "consignment-controller"
+                ],
+                "summary": "Download payment proof image",
+                "operationId": "downloadPaymentProof",
+                "parameters": [
+                    {
+                        "name": "trackingId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/v1/consignments/{trackingId}/delivery-proof/download": {
+            "get": {
+                "tags": [
+                    "consignment-controller"
+                ],
+                "summary": "Download delivery proof image",
+                "operationId": "downloadImage",
+                "parameters": [
+                    {
+                        "name": "trackingId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/v1/consignments/{customerAccount}/consignments/{orderReference}": {
+            "get": {
+                "tags": [
+                    "consignment-controller"
+                ],
+                "summary": "Get detail based on the [order number,customer account]",
+                "operationId": "getOrderDetailByCustomerAccountAndReferenceNumber_1",
+                "parameters": [
+                    {
+                        "name": "customerAccount",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "orderReference",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseObject"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/consignments/export": {
+            "get": {
+                "tags": [
+                    "consignment-controller"
+                ],
+                "summary": "Consignment Export",
+                "operationId": "exportConsignment_1",
+                "parameters": [
+                    {
+                        "name": "request",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/components/schemas/OrderPageRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/v1/consignments/destination-address/template": {
+            "get": {
+                "tags": [
+                    "consignment-controller"
+                ],
+                "operationId": "downloadTemplate",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/v1/consignments/ddu/template/download": {
+            "get": {
+                "tags": [
+                    "consignment-ddu-controller"
+                ],
+                "summary": "Download the template file",
+                "description": "This method allows the user to download the template file to bulk upload.",
+                "operationId": "download_3",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "ConsignmentUpdateBulkCodDTO": {
+                "required": [
+                    "amount",
+                    "currency",
+                    "trackingId"
+                ],
+                "type": "object",
+                "properties": {
+                    "trackingId": {
+                        "type": "string"
+                    },
+                    "amount": {
+                        "minimum": 0,
+                        "type": "number"
+                    },
+                    "currency": {
+                        "type": "string"
+                    }
+                }
+            },
+            "ConsignmentUpdateBulkCodRequest": {
+                "required": [
+                    "dataList"
+                ],
+                "type": "object",
+                "properties": {
+                    "dataList": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ConsignmentUpdateBulkCodDTO"
+                        }
+                    }
+                }
+            },
+            "ErrorMsg": {
+                "type": "object",
+                "properties": {
+                    "index": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "key": {
+                        "type": "string"
+                    },
+                    "field": {
+                        "type": "string"
+                    },
+                    "msg": {
+                        "type": "string"
+                    }
+                }
+            },
+            "ResponseObject": {
+                "type": "object",
+                "properties": {
+                    "errorCode": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "success",
+                            "error",
+                            "import_error"
+                        ]
+                    },
+                    "data": {
+                        "type": "object"
+                    },
+                    "msg": {
+                        "type": "string"
+                    },
+                    "errors": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ErrorMsg"
+                        }
+                    },
+                    "transactionId": {
+                        "type": "string"
+                    }
+                }
+            },
+            "ConsignmentUpdateCodRequest": {
+                "required": [
+                    "amount",
+                    "currency"
+                ],
+                "type": "object",
+                "properties": {
+                    "amount": {
+                        "minimum": 0,
+                        "type": "number"
+                    },
+                    "currency": {
+                        "type": "string"
+                    }
+                }
+            },
+            "CreateAddressDetailRequest": {
+                "required": [
+                    "addressLine1",
+                    "addressLine2",
+                    "addressType",
+                    "country",
+                    "countryCode",
+                    "name",
+                    "phone"
+                ],
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "alias": {
+                        "type": "string"
+                    },
+                    "phone": {
+                        "type": "string",
+                        "description": "Phone should be validated as per the country’s rules"
+                    },
+                    "alternatePhone": {
+                        "type": "string",
+                        "description": "Phone should be validated as per the country’s rules"
+                    },
+                    "country": {
+                        "type": "string",
+                        "description": "Reference to country’s name"
+                    },
+                    "countryCode": {
+                        "type": "string",
+                        "description": "Reference to country’s iso code 3"
+                    },
+                    "city": {
+                        "type": "string",
+                        "description": "Reference to city’s  name"
+                    },
+                    "cityCode": {
+                        "type": "string",
+                        "description": "Reference to city’s  code"
+                    },
+                    "region": {
+                        "type": "string",
+                        "description": "Reference to region’s name"
+                    },
+                    "regionCode": {
+                        "type": "string",
+                        "description": "Reference to region’s code"
+                    },
+                    "district": {
+                        "type": "string",
+                        "description": "Reference to district’s name"
+                    },
+                    "districtCode": {
+                        "type": "string",
+                        "description": "Reference to district’s code"
+                    },
+                    "postalCode": {
+                        "type": "string"
+                    },
+                    "addressLine1": {
+                        "type": "string"
+                    },
+                    "addressLine2": {
+                        "type": "string"
+                    },
+                    "longitude": {
+                        "type": "number",
+                        "description": "Should be valid longitude",
+                        "format": "double"
+                    },
+                    "latitude": {
+                        "type": "number",
+                        "description": "Should be valid latitude",
+                        "format": "double"
+                    },
+                    "email": {
+                        "type": "string",
+                        "description": "Should be valid  email pattern"
+                    },
+                    "addressType": {
+                        "type": "string",
+                        "description": "Values [FREE_TEXT, CUSTOMER_MAPPINGS]",
+                        "enum": [
+                            "CUSTOMER_MAPPINGS",
+                            "FREE_TEXT"
+                        ]
+                    },
+                    "shortAddress": {
+                        "type": "string",
+                        "description": "Mandatory if set for the country mandatory fields field"
+                    },
+                    "isResolved": {
+                        "type": "boolean",
+                        "description": "to be sent by middleware based on if address is resolved or not"
+                    },
+                    "validPhoneNumber": {
+                        "type": "boolean"
+                    }
+                },
+                "description": "AddressDetail Info"
+            },
+            "CreateItemRequest": {
+                "required": [
+                    "currency",
+                    "description",
+                    "packageSequence",
+                    "quantity"
+                ],
+                "type": "object",
+                "properties": {
+                    "description": {
+                        "type": "string"
+                    },
+                    "quantity": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "unitPrice": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "currency": {
+                        "type": "string"
+                    },
+                    "sku": {
+                        "type": "string",
+                        "description": "Mandatory if the pickupMethod=FULFILLMENT"
+                    },
+                    "hsCode": {
+                        "type": "string",
+                        "description": "Mandatory if product’s category is International or Domestic with clearance"
+                    },
+                    "countryOfOrigin": {
+                        "type": "string",
+                        "description": "Mandatory if product’s category is International or Domestic with clearance, Country iso code 3"
+                    },
+                    "packageSequence": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "imageUrl": {
+                        "type": "string"
+                    }
+                },
+                "description": "Item Info"
+            },
+            "CreateOrderRequest": {
+                "required": [
+                    "contentType",
+                    "customerAccount",
+                    "declaredValue",
+                    "declaredValueCurrency",
+                    "deliveryAddress",
+                    "incoterms",
+                    "items",
+                    "packages",
+                    "pickupAddress",
+                    "pickupMethod",
+                    "productCode"
+                ],
+                "type": "object",
+                "properties": {
+                    "referenceNumber": {
+                        "type": "string"
+                    },
+                    "customerAccount": {
+                        "type": "string",
+                        "description": "Customer’s account"
+                    },
+                    "productCode": {
+                        "type": "string",
+                        "description": "product’s code"
+                    },
+                    "pickupMethod": {
+                        "type": "string",
+                        "description": "Values [DROP_OFF, COURIER_PICKUP, FULFILLMENT], if fulfillment, SKU is mandatory for each item.",
+                        "enum": [
+                            "DROP_OFF",
+                            "COURIER_PICKUP",
+                            "FULFILLMENT"
+                        ]
+                    },
+                    "contentType": {
+                        "type": "string",
+                        "description": "Values [Document, Non Document]. Should be as per the allowed content type for the selected product",
+                        "enum": [
+                            "DOCUMENT",
+                            "NON_DOCUMENT",
+                            "BOTH"
+                        ]
+                    },
+                    "declaredValue": {
+                        "type": "number",
+                        "description": "declaredValue",
+                        "format": "double"
+                    },
+                    "declaredValueCurrency": {
+                        "type": "string",
+                        "description": "declaredValueCurrency should be valid currency"
+                    },
+                    "cod": {
+                        "type": "boolean"
+                    },
+                    "codAmount": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "incoterms": {
+                        "type": "string",
+                        "description": "Values [DDP, DDU]. default is DDP",
+                        "enum": [
+                            "DDU",
+                            "DDP"
+                        ]
+                    },
+                    "insured": {
+                        "type": "boolean"
+                    },
+                    "rto": {
+                        "type": "boolean"
+                    },
+                    "content": {
+                        "type": "string"
+                    },
+                    "note": {
+                        "type": "string"
+                    },
+                    "rpu": {
+                        "type": "boolean"
+                    },
+                    "trackingId": {
+                        "maxLength": 15,
+                        "minLength": 15,
+                        "type": "string"
+                    },
+                    "pickupAddress": {
+                        "$ref": "#/components/schemas/CreateAddressDetailRequest"
+                    },
+                    "deliveryAddress": {
+                        "$ref": "#/components/schemas/CreateAddressDetailRequest"
+                    },
+                    "packages": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/CreatePackageRequest"
+                        }
+                    },
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/CreateItemRequest"
+                        }
+                    },
+                    "client": {
+                        "type": "string"
+                    },
+                    "fulfillmentSystem": {
+                        "type": "string"
+                    },
+                    "fulfillmentReferenceNumber": {
+                        "type": "string"
+                    }
+                },
+                "description": "Order Info"
+            },
+            "CreatePackageRequest": {
+                "required": [
+                    "sequence",
+                    "weight",
+                    "weightUnit"
+                ],
+                "type": "object",
+                "properties": {
+                    "sequence": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "weight": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "weightUnit": {
+                        "type": "string",
+                        "description": "Values [GRAM, KG,POUNDS]",
+                        "enum": [
+                            "GRAM",
+                            "KG",
+                            "POUNDS"
+                        ]
+                    },
+                    "dimensionUnit": {
+                        "type": "string",
+                        "description": "Values [CM, INCH]",
+                        "enum": [
+                            "CM",
+                            "INCH"
+                        ]
+                    },
+                    "height": {
+                        "type": "number",
+                        "description": "Mandatory if dimension unit provided",
+                        "format": "double"
+                    },
+                    "width": {
+                        "type": "number",
+                        "description": "Mandatory if dimension unit provided",
+                        "format": "double"
+                    },
+                    "length": {
+                        "type": "number",
+                        "description": "Mandatory if dimension unit provided",
+                        "format": "double"
+                    },
+                    "currentHub": {
+                        "type": "string"
+                    },
+                    "referenceNumber": {
+                        "type": "string"
+                    }
+                },
+                "description": "Package Info"
+            },
+            "RetryOrderCreationEventRequest": {
+                "type": "object",
+                "properties": {
+                    "trackingIds": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "createdStartTime": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "createdEndTime": {
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                }
+            },
+            "ConsignmentCancelRequest": {
+                "required": [
+                    "canceledAt",
+                    "canceledBy",
+                    "trackingIds"
+                ],
+                "type": "object",
+                "properties": {
+                    "trackingIds": {
+                        "maxItems": 2147483647,
+                        "minItems": 1,
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "canceledBy": {
+                        "type": "string"
+                    },
+                    "canceledAt": {
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                }
+            },
+            "CreateCustomerSequencerRequest": {
+                "required": [
+                    "customerAccount",
+                    "endRange",
+                    "key",
+                    "prefix",
+                    "startRange"
+                ],
+                "type": "object",
+                "properties": {
+                    "customerAccount": {
+                        "type": "string"
+                    },
+                    "key": {
+                        "pattern": "^[a-zA-Z0-9]{3}$",
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "NOT_ACTIVE",
+                            "ACTIVE"
+                        ]
+                    },
+                    "returnCreatedOrder": {
+                        "type": "boolean"
+                    },
+                    "prefix": {
+                        "maxLength": 3,
+                        "minLength": 3,
+                        "type": "string"
+                    },
+                    "endRange": {
+                        "pattern": "^\\d{9}$",
+                        "type": "string"
+                    },
+                    "startRange": {
+                        "pattern": "^\\d{9}$",
+                        "type": "string"
+                    }
+                }
+            },
+            "ConsignmentDDUDto": {
+                "required": [
+                    "dduAmount",
+                    "trackingId"
+                ],
+                "type": "object",
+                "properties": {
+                    "trackingId": {
+                        "type": "string"
+                    },
+                    "dduAmount": {
+                        "type": "number",
+                        "format": "double"
+                    }
+                }
+            },
+            "ConsignmentDDURequest": {
+                "required": [
+                    "consignments"
+                ],
+                "type": "object",
+                "properties": {
+                    "consignments": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ConsignmentDDUDto"
+                        }
+                    }
+                }
+            },
+            "PackagePageRequest": {
+                "required": [
+                    "page",
+                    "size"
+                ],
+                "type": "object",
+                "properties": {
+                    "size": {
+                        "type": "integer",
+                        "description": "page size.",
+                        "format": "int32",
+                        "default": 100
+                    },
+                    "page": {
+                        "type": "integer",
+                        "description": "page num.",
+                        "format": "int32",
+                        "default": 0
+                    },
+                    "sortBy": {
+                        "type": "string",
+                        "description": "The fields that need to be sorted are in ascending order by default, and a \"-\" symbol is added before the field to represent descending order."
+                    },
+                    "fields": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "packageTrackingIds": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "trackingIds": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "originCountry": {
+                        "type": "string"
+                    },
+                    "destinationCountry": {
+                        "type": "string"
+                    },
+                    "customerAccounts": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "statusCodes": {
+                        "type": "array",
+                        "items": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    },
+                    "currentHub": {
+                        "type": "string"
+                    },
+                    "filterDate": {
+                        "type": "string"
+                    },
+                    "startTime": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "endTime": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "originHub": {
+                        "type": "string"
+                    },
+                    "types": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "FORWARD",
+                                "RPU",
+                                "RTO"
+                            ]
+                        }
+                    },
+                    "destinationHub": {
+                        "type": "string"
+                    }
+                }
+            },
+            "OrderPageRequest": {
+                "required": [
+                    "page",
+                    "size"
+                ],
+                "type": "object",
+                "properties": {
+                    "size": {
+                        "type": "integer",
+                        "description": "page size.",
+                        "format": "int32",
+                        "default": 100
+                    },
+                    "page": {
+                        "type": "integer",
+                        "description": "page num.",
+                        "format": "int32",
+                        "default": 0
+                    },
+                    "sortBy": {
+                        "type": "string",
+                        "description": "The fields that need to be sorted are in ascending order by default, and a \"-\" symbol is added before the field to represent descending order."
+                    },
+                    "fields": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "referenceNumber": {
+                        "type": "string"
+                    },
+                    "referenceNumbers": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "trackingIds": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "originCountryCode": {
+                        "type": "string"
+                    },
+                    "originCountries": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "originRegionCode": {
+                        "type": "string"
+                    },
+                    "originCityCode": {
+                        "type": "string"
+                    },
+                    "destinationCountryCode": {
+                        "type": "string"
+                    },
+                    "destinationCountries": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "destinationRegionCode": {
+                        "type": "string"
+                    },
+                    "destinationCityCode": {
+                        "type": "string"
+                    },
+                    "customerAccounts": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "statusCodes": {
+                        "type": "array",
+                        "items": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    },
+                    "status": {
+                        "type": "string"
+                    },
+                    "rpu": {
+                        "type": "boolean"
+                    },
+                    "rto": {
+                        "type": "boolean"
+                    },
+                    "filterDate": {
+                        "type": "string"
+                    },
+                    "startTime": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "endTime": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "receiverPhoneNumber": {
+                        "type": "string"
+                    },
+                    "receiverName": {
+                        "type": "string"
+                    },
+                    "customerAccount": {
+                        "type": "string"
+                    },
+                    "fromDate": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "toDate": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "originHubCode": {
+                        "type": "string"
+                    },
+                    "destinationHubCode": {
+                        "type": "string"
+                    },
+                    "currentHubCode": {
+                        "type": "string"
+                    },
+                    "pickupEmployeeCode": {
+                        "type": "string"
+                    },
+                    "deliverEmployeeCode": {
+                        "type": "string"
+                    },
+                    "eventCode": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "types": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "FORWARD",
+                                "RPU",
+                                "RTO"
+                            ]
+                        }
+                    },
+                    "holdReasonCode": {
+                        "type": "string"
+                    },
+                    "deliveredBySupplier": {
+                        "type": "boolean"
+                    },
+                    "collectionSettled": {
+                        "type": "boolean"
+                    },
+                    "amountCollected": {
+                        "type": "boolean"
+                    }
+                }
+            },
+            "WeightReconcileRequest": {
+                "type": "object",
+                "properties": {
+                    "packageTrackingIds": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "UpdateCustomerSequencerStatusRequest": {
+                "required": [
+                    "status"
+                ],
+                "type": "object",
+                "properties": {
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "NOT_ACTIVE",
+                            "ACTIVE"
+                        ]
+                    }
+                }
+            },
+            "BookingSettingsRequest": {
+                "type": "object",
+                "properties": {
+                    "account": {
+                        "type": "string"
+                    },
+                    "returnIfOrderExists": {
+                        "type": "boolean"
+                    },
+                    "addressMappingEnabled": {
+                        "type": "boolean"
+                    }
+                }
+            },
+            "UpdateConsignmentPickupAddressRequest": {
+                "required": [
+                    "addressLine1",
+                    "city"
+                ],
+                "type": "object",
+                "properties": {
+                    "city": {
+                        "type": "string"
+                    },
+                    "district": {
+                        "type": "string"
+                    },
+                    "addressLine1": {
+                        "type": "string"
+                    },
+                    "addressLine2": {
+                        "type": "string"
+                    },
+                    "phone": {
+                        "type": "string"
+                    },
+                    "alternatePhone": {
+                        "type": "string"
+                    },
+                    "searchByCode": {
+                        "type": "boolean"
+                    },
+                    "latitude": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "longitude": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "isResolved": {
+                        "type": "boolean"
+                    }
+                }
+            },
+            "UpdateConsignmentIncotermRequest": {
+                "required": [
+                    "incoterms"
+                ],
+                "type": "object",
+                "properties": {
+                    "incoterms": {
+                        "type": "string",
+                        "enum": [
+                            "DDU",
+                            "DDP"
+                        ]
+                    }
+                }
+            },
+            "UpdateFulfillmentRequest": {
+                "type": "object",
+                "properties": {
+                    "fulfillmentSystem": {
+                        "type": "string"
+                    },
+                    "fulfillmentReferenceNumber": {
+                        "type": "string"
+                    }
+                }
+            },
+            "UpdateConsignmentDestinationAddressRequest": {
+                "required": [
+                    "addressLine1",
+                    "city"
+                ],
+                "type": "object",
+                "properties": {
+                    "city": {
+                        "type": "string"
+                    },
+                    "district": {
+                        "type": "string"
+                    },
+                    "addressLine1": {
+                        "type": "string"
+                    },
+                    "addressLine2": {
+                        "type": "string"
+                    },
+                    "phone": {
+                        "type": "string"
+                    },
+                    "alternatePhone": {
+                        "type": "string"
+                    },
+                    "searchByCode": {
+                        "type": "boolean"
+                    },
+                    "latitude": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "longitude": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "isResolved": {
+                        "type": "boolean"
+                    }
+                }
+            },
+            "ApplyConsignmentDDURequest": {
+                "type": "object",
+                "properties": {
+                    "dduAmount": {
+                        "type": "number",
+                        "format": "double"
+                    }
+                }
+            },
+            "CustomerSequencerPageRequest": {
+                "required": [
+                    "page",
+                    "size"
+                ],
+                "type": "object",
+                "properties": {
+                    "size": {
+                        "type": "integer",
+                        "description": "page size.",
+                        "format": "int32",
+                        "default": 100
+                    },
+                    "page": {
+                        "type": "integer",
+                        "description": "page num.",
+                        "format": "int32",
+                        "default": 0
+                    },
+                    "sortBy": {
+                        "type": "string",
+                        "description": "The fields that need to be sorted are in ascending order by default, and a \"-\" symbol is added before the field to represent descending order."
+                    },
+                    "fields": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "customerAccount": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "NOT_ACTIVE",
+                            "ACTIVE"
+                        ]
+                    }
+                }
+            }
+        },
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
+            }
+        }
+    }
+}

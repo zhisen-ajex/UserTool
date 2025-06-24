@@ -1,0 +1,30 @@
+package {{package}};
+
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.*;
+
+{{#imports}}
+import {{this}};
+{{/imports}}
+
+@FeignClient(
+    name = "{{serviceName}}",
+    url = "${application.urls.{{serviceName}}-service}",
+    configuration = {{configClassName}}.class
+)
+public interface {{className}} {
+
+{{#operations}}
+    /**
+     * {{summary}}
+     */
+    @{{httpMethod}}Mapping("{{path}}")
+    {{#params}}
+        @{{paramType}}("{{paramName}}") {{dataType}} {{varName}}{{^last}}, {{/last}}
+    {{/params}}
+    {{returnType}} {{methodName}}({{#params}}
+        {{dataType}} {{varName}}{{^last}}, {{/last}}{{/params}});
+
+{{/operations}}
+
+}

@@ -1,0 +1,28 @@
+server:
+  port: 8299
+spring:
+  servlet:
+    multipart:
+      max-file-size: 40MB
+      max-request-size: 40MB
+  application:
+    name: verify
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+  datasource:
+    url: jdbc:mysql://localhost:3306/orders-cs
+    username: root
+    password: password
+    driverClassName: com.mysql.cj.jdbc.Driver
+
+# Logger Config
+logging:
+  level:
+    root: debug  # 开发环境全局 DEBUG
+#    com.verify: debug
+##    org.springframework: debug
+##    org.hibernate: debug
+#    org.hibernate.orm.jdbc.bind: trace
+

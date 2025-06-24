@@ -1,0 +1,58 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: verify-gke-sql
+  namespace: aone-stage
+  labels:
+    app: verify-gke-sql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: verify-gke-sql
+  template:
+    metadata:
+      labels:
+        app: verify-gke-sql
+    spec:
+      serviceAccountName: api-gateway-sa
+      containers:
+        - name: verify-gke-sql
+          image: asia-south2-docker.pkg.dev/middleware-test-339406/images/ajex/verify-gke-sql:0.0.2
+          imagePullPolicy: Always
+          env:
+#            - name: SPRING_PROFILES_ACTIVE
+#              value: stage
+#            - name: SPRING_CONFIG_SERVER_URL
+#              value: http://configs-server:7100
+#            - name: SPRING_CONFIG_USERNAME
+#              value: aone-config-user
+#            - name: SPRING_CONFIG_PASSWORD
+#              value: test_password
+#            - name: MONGODB_URI
+#              value: mongodb+srv://aone-stage-user:8mTwRicbG30Jxktd@serverlessinstance0.6gxvr.mongodb.net/aone-shipsy-orders
+          ports:
+          - containerPort: 8090
+#          readinessProbe:
+#            httpGet:
+#              port: 8090
+#              path: "/actuator/health"
+#            initialDelaySeconds: 10
+#            timeoutSeconds: 5
+      restartPolicy: Always
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: verify-gke-sql
+  namespace: aone-stage
+spec:
+  selector:
+    app: verify-gke-sql
+  ports:
+    - port: 8090
+      targetPort: 8090
+  type: NodePort
