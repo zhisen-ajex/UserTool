@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
@@ -37,6 +38,7 @@ public class FreightCalculationService {
     }
 
     private final ShippingRateRepository shippingRateRepository;
+
     public BigDecimal calculateFreight(String customerCode, PricingRule rule, BigDecimal weight) {
 
         if ("AJCN711".equals(customerCode)) {
@@ -65,13 +67,14 @@ public class FreightCalculationService {
 
     /**
      * Customs Clearance: $0.32 USD/kg = 1.2 SAR/Kg
-     *
+     * <p>
      * •  Prepaid (PPD):
      * •	2.5–5 kg: $1.80 USD = 6.75 SAR
      * •	Additional kg: $0.12 USD/kg = 0.45 SAR/Kg
      * •  Cash on Delivery (COD):
      * •	2–5 kg: $2.40 USD = 9 SAR
      * •	Additional kg: $0.12 USD/kg = 0.45 SAR/Kg
+     *
      * @param weight
      * @param serviceType
      * @return
@@ -79,9 +82,9 @@ public class FreightCalculationService {
     public static BigDecimal calculateUAEFreight(BigDecimal weight, ServiceType serviceType) {
         BigDecimal shippingCost = null;
 
-        if (serviceType == ServiceType.PPD ) {
+        if (serviceType == ServiceType.PPD) {
             shippingCost = BigDecimal.valueOf(6.75); // base price for PPD > 5kg
-        } else if (serviceType == ServiceType.COD){
+        } else if (serviceType == ServiceType.COD) {
             shippingCost = BigDecimal.valueOf(9); // base price for COD or PPD <= 5kg
         }
 
@@ -96,6 +99,7 @@ public class FreightCalculationService {
         shippingCost = shippingCost.add(weight.multiply(BigDecimal.valueOf(1.2))); //Customs Clearance: $0.32 USD/kg = 1.2 SAR/Kg
         return shippingCost;
     }
+
     public static void main(String[] args) {
         // 测试用例 1：PPD，重量 3kg
         BigDecimal freight1 = calculateUAEFreight(BigDecimal.valueOf(3), ServiceType.PPD);
@@ -116,11 +120,16 @@ public class FreightCalculationService {
 
 
     public BigDecimal calculateFreight(String countryCode, ServiceType serviceType, BigDecimal weight) {
+        Optional<ShippingRate> tempRate = shippingRateRepository.findSuitableRate(countryCode, serviceType, weight);
+        if (tempRate.isEmpty()) {
+            weight = BigDecimal.valueOf(10);
+        }
 
+        BigDecimal finalWeight = weight;
         ShippingRate rate = shippingRateRepository.findSuitableRate(countryCode, serviceType, weight)
                 .orElseThrow(() -> {
                     log.warn("No suitable shipping rate found for countryCode={}, serviceType={}, weight={}",
-                            countryCode, serviceType, weight);
+                            countryCode, serviceType, finalWeight);
                     return new IllegalArgumentException("No suitable shipping rate found");
                 });
         BigDecimal shippingCost;
@@ -156,6 +165,7 @@ public class FreightCalculationService {
             return BigDecimal.valueOf(16).add(BigDecimal.valueOf(0.5).multiply(BigDecimal.valueOf(units)));
         }
     }
+
     public BigDecimal calculateCODFee(PricingRule rule, BigDecimal codAmount) {
         BigDecimal codFee;
 
@@ -198,9 +208,10 @@ public class FreightCalculationService {
 
     /**
      * 货币转换
-     * @param amount  需要转换的金额
+     *
+     * @param amount       需要转换的金额
      * @param fromCurrency 源货币
-     * @param toCurrency 目标货币
+     * @param toCurrency   目标货币
      * @return 转换后的金额
      */
     public BigDecimal convert(BigDecimal amount, String fromCurrency, String toCurrency) {
@@ -215,9 +226,10 @@ public class FreightCalculationService {
 
     /**
      * 更新汇率（可用于定期同步）
+     *
      * @param fromCurrency 源货币
-     * @param toCurrency 目标货币
-     * @param rate 新的汇率
+     * @param toCurrency   目标货币
+     * @param rate         新的汇率
      */
     public void updateExchangeRate(String fromCurrency, String toCurrency, BigDecimal rate) {
         exchangeRates.put(fromCurrency + "_TO_" + toCurrency, rate);
