@@ -4,13 +4,12 @@ import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.event.AnalysisEventListener;
 import com.verify.dto.OrderRevenueImportDTO;
-import com.verify.entity.KsaCity;
-import com.verify.entity.OrderRevenue;
-import com.verify.entity.PricingRule;
-import com.verify.entity.ServiceType;
+import com.verify.dto.RemoteCityImportDTO;
+import com.verify.entity.*;
 import com.verify.repository.KsaCityRepository;
 import com.verify.repository.OrderRevenueRepository;
 import com.verify.repository.PricingRuleRepository;
+import com.verify.repository.RemoteCityRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +33,11 @@ public class OrderImportService {
     private final PricingRuleRepository pricingRuleRepository;
     private final KsaCityRepository ksaCityRepository;
 
+    private final RemoteCityRepository remoteCityRepository;
+
     private Map<String, List<PricingRule>> pricingRulesCache = new HashMap<>();
+    private Map<String, Boolean> remoteCityCache = new HashMap<>();
+
     private static final Map<String, BigDecimal> EXCHANGE_RATES = Map.of(
             "AED", new BigDecimal("1.02"),  // 阿联酋迪拉姆 -> SAR
             "SAR", BigDecimal.ONE,           // 沙特里亚尔 -> SAR (不变)
@@ -53,12 +56,16 @@ public class OrderImportService {
             "BAHRAIN", "BHD",
             "KUWAIT", "KWD"
     );
+
     @PostConstruct
     public void loadPricingRules() {
         log.info("Loading all pricing rules into memory...");
         List<PricingRule> allPricingRules = pricingRuleRepository.findAll();
         pricingRulesCache = allPricingRules.stream().collect(Collectors.groupingBy(PricingRule::getCustomerCode));
         log.info("Loaded {} pricing rules", allPricingRules.size());
+        List<RemoteCity> allRemoteCity = remoteCityRepository.findAll();
+        remoteCityCache = allRemoteCity.stream()
+                .collect(Collectors.toMap(x->x.getCountryIsoCode3()+x.getCityCode(), y-> y.getIsRemote()));
     }
 
     public void importOrders(MultipartFile file) throws IOException {
@@ -113,29 +120,29 @@ public class OrderImportService {
         order.setPickupDate(dto.getPickupDate());
         order.setDeliveryDate(dto.getDeliveryDate());
         order.setStatus(dto.getStatus());
-        if(dto.getCodAmount()==null){
+        if (dto.getCodAmount() == null) {
             dto.setCodAmount(BigDecimal.ZERO);
         }
         String productCode = dto.getProductCode().replace("AJEX ", "");
         String type = dto.getCodAmount().compareTo(BigDecimal.ZERO) > 0 ? "COD" : "PPD";
 
         order.setType(type);
-        if ("AJEX850".equals(dto.getCustomerCode()) && ("SAUDI ARABIA".equals(dto.getConsigneeCountry())||"SAU".equals(dto.getConsigneeCountry()))) {
-            String country= null;
-            KsaCity ksaCity= ksaCityRepository.findByCode(dto.getConsigneeCity());
-            if(ksaCity==null){
-                log.error("ksaCity ERROR:{} ={} is null",dto.getOrderId(),dto.getConsigneeCity());
+        if ("AJEX850".equals(dto.getCustomerCode()) && ("SAUDI ARABIA".equals(dto.getConsigneeCountry()) || "SAU".equals(dto.getConsigneeCountry()))) {
+            String country = null;
+            KsaCity ksaCity = ksaCityRepository.findByCode(dto.getConsigneeCity());
+            if (ksaCity == null) {
+                log.error("ksaCity ERROR:{} ={} is null", dto.getOrderId(), dto.getConsigneeCity());
                 return Optional.of(order);
             }
-            if("SAU-TIER1".equals(ksaCity.getTierCode())){
-                country="KSA-T1";
-            }else  if("SAU-TIER2".equals(ksaCity.getTierCode())){
-                country="KSA-T2";
-            }else  if("SAU-TIER3".equals(ksaCity.getTierCode())){
-                country="KSA-T3";
+            if ("SAU-TIER1".equals(ksaCity.getTierCode())) {
+                country = "KSA-T1";
+            } else if ("SAU-TIER2".equals(ksaCity.getTierCode())) {
+                country = "KSA-T2";
+            } else if ("SAU-TIER3".equals(ksaCity.getTierCode())) {
+                country = "KSA-T3";
             }
-            BigDecimal freight = freightCalculationService.calculateFreight(country,dto.getCodAmount().compareTo(BigDecimal.ZERO) > 0 ? ServiceType.COD:ServiceType.PPD, dto.getChargeableWeight());
-            BigDecimal exchangeRate = EXCHANGE_RATES.getOrDefault( "USD", BigDecimal.ONE);
+            BigDecimal freight = freightCalculationService.calculateFreight(country, dto.getCodAmount().compareTo(BigDecimal.ZERO) > 0 ? ServiceType.COD : ServiceType.PPD, dto.getChargeableWeight());
+            BigDecimal exchangeRate = EXCHANGE_RATES.getOrDefault("USD", BigDecimal.ONE);
             freight = freight.multiply(exchangeRate);
             order.setFreight(freight);
             order.setConsigneeTier(country);
@@ -153,8 +160,7 @@ public class OrderImportService {
         Optional<PricingRule> ruleOpt = pricingRules.stream()
                 .filter(rule -> rule.getProducts().contains(productCode)) // 匹配产品
                 .filter(rule -> "AJEX850".equals(dto.getCustomerCode()) ?
-                        rule.getCountry().equals(dto.getConsigneeCountry()) &&
-                                rule.getType().equals(type)
+                        rule.getCountry().equals(dto.getConsigneeCountry()) && rule.getType().equals(type)
                         : true) // 仅对 "AJEX850" 额外筛选
                 .findFirst(); // 获取第一个匹配的规则
 
@@ -190,35 +196,22 @@ public class OrderImportService {
         }
 
 
-        if ("AJEX850".equals(dto.getCustomerCode())&&(dto.getConsigneeCountry().equals("BAHRAIN")||dto.getConsigneeCountry().equals("BHR"))) {
+        if ("AJEX850".equals(dto.getCustomerCode()) && (dto.getConsigneeCountry().equals("BAHRAIN") || dto.getConsigneeCountry().equals("BHR"))) {
             freight = freight.add(BigDecimal.valueOf(0.32).multiply(dto.getChargeableWeight()).multiply(EXCHANGE_RATES.getOrDefault("USD", BigDecimal.ONE)));
         }
-        if ("AJEX850".equals(dto.getCustomerCode())&&(dto.getConsigneeCountry().equals("KUWAIT")||dto.getConsigneeCountry().equals("KWT"))) {
+        if ("AJEX850".equals(dto.getCustomerCode()) && (dto.getConsigneeCountry().equals("KUWAIT") || dto.getConsigneeCountry().equals("KWT"))) {
             freight = freight.add(BigDecimal.valueOf(1.7).multiply(dto.getChargeableWeight()).multiply(EXCHANGE_RATES.getOrDefault("USD", BigDecimal.ONE)));
         }
-        if ("AJEX850".equals(dto.getCustomerCode())&&(dto.getConsigneeCountry().equals("UNITED ARAB EMIRATES")||dto.getConsigneeCountry().equals("ARE"))) {
+        if ("AJEX850".equals(dto.getCustomerCode()) && (dto.getConsigneeCountry().equals("UNITED ARAB EMIRATES") || dto.getConsigneeCountry().equals("ARE"))) {
             freight = freight.add(BigDecimal.valueOf(0.42).multiply(dto.getChargeableWeight()).multiply(EXCHANGE_RATES.getOrDefault("USD", BigDecimal.ONE)));
         }
 
-        if ("AJEX1542".equals(dto.getCustomerCode())&&dto.getConsigneeCountry().equals("SAU")) {
-            List<String> remoteCities = new ArrayList<>(Arrays.asList(
-                    "HURAYMILA",
-                    "DAMMAM",
-                    "RIYADH",
-                    "JEDDAH",
-                    "ES01",
-                    "SS",
-                    "AL MAJMA'",
-                    "THADIQ",
-                    "AL MAJMA'AH"
-            ));
-            if(remoteCities.contains(dto.getConsigneeCity())){
+        if ("AJEX1542".equals(dto.getCustomerCode()) || "AJ402787000005".equals(dto.getCustomerCode())
+                || "AJCN77".equals(dto.getCustomerCode()) || "AJEX1578".equals(dto.getCustomerCode())) {
+            if(remoteCityCache.get(dto.getConsigneeCountry()+dto.getConsigneeCity())){
                 freight = freight.add(BigDecimal.valueOf(1.1).multiply(EXCHANGE_RATES.getOrDefault("USD", BigDecimal.ONE)));
             }
         }
-
-
-
 
         order.setFreight(freight);
 
@@ -246,14 +239,8 @@ public class OrderImportService {
                     codAmountInSAR
             );
             codFee = convertToSAR(codFee, rule.getCurrency());
-
-
             order.setCodFee(codFee);
-
-
         }
-
-
 
 
         return Optional.of(order);
@@ -266,4 +253,21 @@ public class OrderImportService {
         BigDecimal rate = EXCHANGE_RATES.getOrDefault(fromCurrency, BigDecimal.ONE);
         return amount.multiply(rate);
     }
+
+
+    public void importRemote (MultipartFile file) throws IOException {
+        List<RemoteCityImportDTO> ll = EasyExcel.read(file.getInputStream()).head(RemoteCityImportDTO.class).sheet().autoTrim(true).doReadSync();
+        List<RemoteCity> entities = new ArrayList<>();
+        for (RemoteCityImportDTO dto : ll) {
+            RemoteCity temp = new RemoteCity();
+            temp.setCountryIsoCode3(dto.getCountryIsoCode3());
+            temp.setRegionCode(dto.getRegionCode());
+            temp.setCityCode(dto.getCityCode());
+            temp.setCityName(dto.getCityName());
+            temp.setIsRemote(dto.getIsRemote());
+            entities.add(temp);
+        }
+        remoteCityRepository.saveAll(entities);
+    }
+
 }

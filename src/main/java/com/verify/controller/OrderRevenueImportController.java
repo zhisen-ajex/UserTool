@@ -42,6 +42,22 @@ public class OrderRevenueImportController {
         }
     }
 
+    @PostMapping("/import33")
+    public void importRemoteCity(@RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            return;
+        }
+        try {
+
+            orderImportService.importRemote(file);
+        } catch (IOException e) {
+            log.error("Excel 解析失败", e);
+
+        }
+    }
+
+
+
     @PostMapping
     public Map<String,String> shipperInfoService() throws JsonProcessingException {
 
