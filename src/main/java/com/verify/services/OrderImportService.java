@@ -191,13 +191,13 @@ public class OrderImportService {
 
 
         if ("AJEX850".equals(dto.getCustomerCode())&&(dto.getConsigneeCountry().equals("BAHRAIN")||dto.getConsigneeCountry().equals("BHR"))) {
-            freight = freight.add(BigDecimal.valueOf(0.32).multiply(dto.getChargeableWeight()).multiply(EXCHANGE_RATES.getOrDefault("USD", BigDecimal.ONE)));
+            freight = freight.add(BigDecimal.valueOf(0.25).multiply(dto.getChargeableWeight()).multiply(EXCHANGE_RATES.getOrDefault("USD", BigDecimal.ONE)));
         }
         if ("AJEX850".equals(dto.getCustomerCode())&&(dto.getConsigneeCountry().equals("KUWAIT")||dto.getConsigneeCountry().equals("KWT"))) {
-            freight = freight.add(BigDecimal.valueOf(1.7).multiply(dto.getChargeableWeight()).multiply(EXCHANGE_RATES.getOrDefault("USD", BigDecimal.ONE)));
+            freight = freight.add(BigDecimal.valueOf(1.7).multiply(EXCHANGE_RATES.getOrDefault("USD", BigDecimal.ONE)));
         }
         if ("AJEX850".equals(dto.getCustomerCode())&&(dto.getConsigneeCountry().equals("UNITED ARAB EMIRATES")||dto.getConsigneeCountry().equals("ARE"))) {
-            freight = freight.add(BigDecimal.valueOf(0.42).multiply(dto.getChargeableWeight()).multiply(EXCHANGE_RATES.getOrDefault("USD", BigDecimal.ONE)));
+            freight = freight.add(BigDecimal.valueOf(0.32).multiply(dto.getChargeableWeight()).multiply(EXCHANGE_RATES.getOrDefault("USD", BigDecimal.ONE)));
         }
 
         if ("AJEX1542".equals(dto.getCustomerCode())&&dto.getConsigneeCountry().equals("SAU")) {
