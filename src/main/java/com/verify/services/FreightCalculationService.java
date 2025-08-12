@@ -120,10 +120,11 @@ public class FreightCalculationService {
 
 
     public BigDecimal calculateFreight(String countryCode, ServiceType serviceType, BigDecimal weight) {
-        Optional<ShippingRate> tempRate = shippingRateRepository.findSuitableRate(countryCode, serviceType, weight);
-        if (tempRate.isEmpty()) {
-            weight = BigDecimal.valueOf(10);
-        }
+        //todo 看情况开
+//        Optional<ShippingRate> tempRate = shippingRateRepository.findSuitableRate(countryCode, serviceType, weight);
+//        if (tempRate.isEmpty()) {
+//            weight = BigDecimal.valueOf(10);
+//        }
 
         BigDecimal finalWeight = weight;
         ShippingRate rate = shippingRateRepository.findSuitableRate(countryCode, serviceType, weight)
