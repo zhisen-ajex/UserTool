@@ -40,6 +40,9 @@ public class OrderRevenueImportDTO {
     @ExcelProperty("chargeable_weight")
     private BigDecimal chargeableWeight;
 
+    @ExcelProperty("weight_unit")
+    private String weightUnit;
+
     @ExcelProperty("cod_amount")
     private BigDecimal codAmount;
 

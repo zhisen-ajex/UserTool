@@ -13,6 +13,7 @@ import com.verify.repository.RemoteCityRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -90,7 +91,7 @@ public class OrderImportService {
                             saveBatch(batchList);
                         }
                     }
-                }).sheet().doRead();
+                }).sheet("Freight").doRead();
     }
 
     private void saveBatch(List<OrderRevenueImportDTO> dataList) {
@@ -108,6 +109,10 @@ public class OrderImportService {
         order.setCustomerName(dto.getCustomerName());
         order.setStatus(dto.getStatus());
         order.setChargeableWeight(dto.getChargeableWeight());
+        if(dto.getWeightUnit() != null && StringUtils.equals(dto.getWeightUnit().toLowerCase(), "gram")) {
+            dto.setChargeableWeight(dto.getChargeableWeight().divide(BigDecimal.valueOf(1000)));
+            order.setChargeableWeight(dto.getChargeableWeight());
+        }
         order.setCodAmount(dto.getCodAmount());
         order.setCodCurrency(dto.getCodCurrency());
         order.setSenderCountry(dto.getSenderCountry());
@@ -168,6 +173,7 @@ public class OrderImportService {
         if (ruleOpt.isEmpty() && ("AJEX CCX".equals(dto.getProductCode()) || "CCX".equals(dto.getProductCode()))) {
             ruleOpt = pricingRules.stream().findFirst();
         }
+
 
         // 3️⃣ **如果仍未找到，记录错误日志**
         if (ruleOpt.isEmpty()) {
