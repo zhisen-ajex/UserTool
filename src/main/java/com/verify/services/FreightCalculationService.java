@@ -45,6 +45,10 @@ public class FreightCalculationService {
             return calculateFreightForAJCN711(weight);
         }
 
+        if ("AJEX1770".equals(customerCode)&& "IRX".equals(rule.getProducts()) ) {
+            return calculateFreightForAJEX1770IRX(weight);
+        }
+
 
         BigDecimal totalFreight = rule.getBasePrice();
         BigDecimal extraWeight = weight.subtract(rule.getBaseWeight());
@@ -164,6 +168,19 @@ public class FreightCalculationService {
             BigDecimal extraWeight = weight.subtract(BigDecimal.valueOf(10));
             int units = extraWeight.divide(BigDecimal.valueOf(0.1), 0, BigDecimal.ROUND_CEILING).intValue();
             return BigDecimal.valueOf(16).add(BigDecimal.valueOf(0.5).multiply(BigDecimal.valueOf(units)));
+        }
+    }
+
+    private BigDecimal calculateFreightForAJEX1770IRX(BigDecimal weight) {
+        if (weight.compareTo(BigDecimal.valueOf(5)) < 0) {
+            return weight.setScale(0, RoundingMode.DOWN).multiply(new BigDecimal("0.82")).add(new BigDecimal("10.82"));
+        } else if (weight.compareTo(BigDecimal.valueOf(10)) < 0) {
+            BigDecimal extraWeight = weight.subtract(BigDecimal.valueOf(5)).setScale(0, RoundingMode.DOWN);
+            return extraWeight.multiply(new BigDecimal("1.82")).add(new BigDecimal("15.92"));
+        } else {
+            BigDecimal extraWeight = weight.subtract(BigDecimal.valueOf(10));
+            int units = extraWeight.divide(BigDecimal.valueOf(1), 0, BigDecimal.ROUND_CEILING).intValue();
+            return BigDecimal.valueOf(23.2).add(BigDecimal.valueOf(1.82).multiply(BigDecimal.valueOf(units)));
         }
     }
 

@@ -66,7 +66,7 @@ public class OrderImportService {
         log.info("Loaded {} pricing rules", allPricingRules.size());
         List<RemoteCity> allRemoteCity = remoteCityRepository.findAll();
         remoteCityCache = allRemoteCity.stream()
-                .collect(Collectors.toMap(x->x.getCountryIsoCode3()+x.getCityCode(), y-> y.getIsRemote()));
+                .collect(Collectors.toMap(x -> x.getCountryIsoCode3() + x.getCityCode(), y -> y.getIsRemote()));
     }
 
     public void importOrders(MultipartFile file) throws IOException {
@@ -109,7 +109,7 @@ public class OrderImportService {
         order.setCustomerName(dto.getCustomerName());
         order.setStatus(dto.getStatus());
         order.setChargeableWeight(dto.getChargeableWeight());
-        if(dto.getWeightUnit() != null && StringUtils.equals(dto.getWeightUnit().toLowerCase(), "gram")) {
+        if (dto.getWeightUnit() != null && StringUtils.equals(dto.getWeightUnit().toLowerCase(), "gram")) {
             dto.setChargeableWeight(dto.getChargeableWeight().divide(BigDecimal.valueOf(1000)));
             order.setChargeableWeight(dto.getChargeableWeight());
         }
@@ -167,6 +167,18 @@ public class OrderImportService {
                 .filter(rule -> "AJEX850".equals(dto.getCustomerCode()) ?
                         rule.getCountry().equals(dto.getConsigneeCountry()) && rule.getType().equals(type)
                         : true) // 仅对 "AJEX850" 额外筛选
+                .filter(rule -> {
+                    if ("AJEX1770".equals(dto.getCustomerCode()) && "AJEX IRX".equals(dto.getProductCode())) {
+                        BigDecimal cw = dto.getChargeableWeight();
+                        BigDecimal bw = rule.getBaseWeight();
+                        if (cw == null || bw == null) return false;
+
+                        // cw >= 5 -> bw == 5 ; cw < 5 -> bw == 0
+                        return (cw.compareTo(BigDecimal.valueOf(5)) >= 0 && bw.compareTo(BigDecimal.valueOf(5)) == 0)
+                                || (cw.compareTo(BigDecimal.valueOf(5)) < 0 && bw.compareTo(BigDecimal.ZERO) == 0);
+                    }
+                    return true;
+                })
                 .findFirst(); // 获取第一个匹配的规则
 
         // 2️⃣ **如果未找到 & 产品是 "AJEX CCX" 或 "CCX"，则返回该客户的任何一个规则**
@@ -202,19 +214,20 @@ public class OrderImportService {
         }
 
 
-        if ("AJEX850".equals(dto.getCustomerCode())&&(dto.getConsigneeCountry().equals("BAHRAIN")||dto.getConsigneeCountry().equals("BHR"))) {
+        if ("AJEX850".equals(dto.getCustomerCode()) && (dto.getConsigneeCountry().equals("BAHRAIN") || dto.getConsigneeCountry().equals("BHR"))) {
             freight = freight.add(BigDecimal.valueOf(0.25).multiply(dto.getChargeableWeight()).multiply(EXCHANGE_RATES.getOrDefault("USD", BigDecimal.ONE)));
         }
-        if ("AJEX850".equals(dto.getCustomerCode())&&(dto.getConsigneeCountry().equals("KUWAIT")||dto.getConsigneeCountry().equals("KWT"))) {
+        if ("AJEX850".equals(dto.getCustomerCode()) && (dto.getConsigneeCountry().equals("KUWAIT") || dto.getConsigneeCountry().equals("KWT"))) {
             freight = freight.add(BigDecimal.valueOf(1.7).multiply(EXCHANGE_RATES.getOrDefault("USD", BigDecimal.ONE)));
         }
-        if ("AJEX850".equals(dto.getCustomerCode())&&(dto.getConsigneeCountry().equals("UNITED ARAB EMIRATES")||dto.getConsigneeCountry().equals("ARE"))) {
+        if ("AJEX850".equals(dto.getCustomerCode()) && (dto.getConsigneeCountry().equals("UNITED ARAB EMIRATES") || dto.getConsigneeCountry().equals("ARE"))) {
             freight = freight.add(BigDecimal.valueOf(0.32).multiply(dto.getChargeableWeight()).multiply(EXCHANGE_RATES.getOrDefault("USD", BigDecimal.ONE)));
         }
 
         if ("AJEX1542".equals(dto.getCustomerCode()) || "AJ402787000005".equals(dto.getCustomerCode())
                 || "AJCN77".equals(dto.getCustomerCode()) || "AJEX1578".equals(dto.getCustomerCode())) {
-            if(remoteCityCache.get(dto.getConsigneeCountry()+dto.getConsigneeCity())){
+            log.info("111"+dto.getConsigneeCountry() + dto.getConsigneeCity());
+            if (remoteCityCache.get(dto.getConsigneeCountry() + dto.getConsigneeCity())) {
                 freight = freight.add(BigDecimal.valueOf(1.1).multiply(EXCHANGE_RATES.getOrDefault("USD", BigDecimal.ONE)));
             }
         }
@@ -261,7 +274,7 @@ public class OrderImportService {
     }
 
 
-    public void importRemote (MultipartFile file) throws IOException {
+    public void importRemote(MultipartFile file) throws IOException {
         List<RemoteCityImportDTO> ll = EasyExcel.read(file.getInputStream()).head(RemoteCityImportDTO.class).sheet().autoTrim(true).doReadSync();
         List<RemoteCity> entities = new ArrayList<>();
         for (RemoteCityImportDTO dto : ll) {
