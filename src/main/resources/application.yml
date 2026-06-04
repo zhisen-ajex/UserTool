@@ -1,5 +1,5 @@
 server:
-  port: 8399
+  port: 8299
 spring:
   servlet:
     multipart:
@@ -14,7 +14,7 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/orders-cs
     username: root
-    password: password
+    password: 123
     driverClassName: com.mysql.cj.jdbc.Driver
 
 # Logger Config
