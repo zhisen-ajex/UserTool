@@ -11,11 +11,23 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: update
+    database-platform: org.hibernate.dialect.MySQLDialect
   datasource:
-    url: jdbc:mysql://localhost:3306/orders-cs
+    jdbc-url: jdbc:mysql://127.0.0.1:3306/orders-cs
     username: root
-    password: 123
+    password: password
     driverClassName: com.mysql.cj.jdbc.Driver
+report:
+  datasource:
+    jdbc-url: jdbc:mysql://8.228.219.154:3306/aone-ops?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+    username: zhisen-li
+    password: 4EvR+krLvXc!Tfaf
+    driverClassName: com.mysql.cj.jdbc.Driver
+    maximum-pool-size: 10
+    minimum-idle: 2
+  export-dir: ${REPORT_EXPORT_DIR:./exports}
+  prefix: ${EXPORT_PREFIX:ajex_report}
+  sql-path: classpath:sql/
 
 # Logger Config
 logging:
