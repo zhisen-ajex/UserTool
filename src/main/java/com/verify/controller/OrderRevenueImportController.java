@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
@@ -67,25 +66,6 @@ public class OrderRevenueImportController {
         response.flushBuffer();
     }
 
-    @GetMapping("/export-order-revenue")
-    public void exportOrderRevenue(HttpServletResponse response) throws IOException {
-
-        LocalDate reportDate = LocalDate.now(ZoneId.of("Asia/Shanghai")).minusDays(1);
-        String fileName = "order_revenue_report_" + reportDate.format(DateTimeFormatter.ISO_DATE) + ".xlsx";
-        String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8).replaceAll("\\+", "%20");
-
-        response.reset();
-        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        response.setHeader(HttpHeaders.CONTENT_DISPOSITION,
-                "attachment; filename=\"" + fileName + "\"; filename*=UTF-8''" + encodedFileName);
-        response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-        response.setHeader("Pragma", "no-cache");
-        response.setHeader("Expires", "0");
-
-        dataMonitorService.exportOrderRevenue(response.getOutputStream(), reportDate);
-        response.flushBuffer();
-    }
 
 //    @PostMapping("/import33")
 //    public void importRemoteCity(@RequestParam("file") MultipartFile file) {
