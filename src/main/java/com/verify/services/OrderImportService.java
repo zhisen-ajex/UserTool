@@ -94,6 +94,17 @@ public class OrderImportService {
                 }).sheet("Freight").doRead();
     }
 
+    /**
+     * 直接处理已解析好的订单数据（无需上传 MultipartFile）。
+     * 复用 saveBatch 完成运费计算并保存到数据库。
+     */
+    public void importOrderData(List<OrderRevenueImportDTO> dataList) {
+        if (dataList == null || dataList.isEmpty()) {
+            return;
+        }
+        saveBatch(dataList);
+    }
+
     private void saveBatch(List<OrderRevenueImportDTO> dataList) {
         List<OrderRevenue> orderRevenueList = dataList.stream().map(this::mapToEntity)
                 .filter(Optional::isPresent)  // 过滤掉 Optional.empty()
@@ -227,7 +238,7 @@ public class OrderImportService {
         if ("AJEX1542".equals(dto.getCustomerCode()) || "AJ402787000005".equals(dto.getCustomerCode())
                 || "AJCN77".equals(dto.getCustomerCode()) || "AJEX1578".equals(dto.getCustomerCode())) {
             log.info("111"+dto.getConsigneeCountry() + dto.getConsigneeCity());
-            if (remoteCityCache.get(dto.getConsigneeCountry() + dto.getConsigneeCity())) {
+            if (remoteCityCache.getOrDefault(dto.getConsigneeCountry() + dto.getConsigneeCity(), false)) {
                 freight = freight.add(BigDecimal.valueOf(1.1).multiply(EXCHANGE_RATES.getOrDefault("USD", BigDecimal.ONE)));
             }
         }
